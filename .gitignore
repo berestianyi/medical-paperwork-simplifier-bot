@@ -1,0 +1,5 @@
+.idea/
+__pycache__/
+sign_codes/k.lena.jks
+sign_codes/lena.jks
+config.py
