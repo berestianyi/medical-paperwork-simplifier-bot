@@ -63,7 +63,7 @@ def filling_out_appointment_card(helsi_person):
 
                 match = re.match(r"\d+-\d+\s([А-ЩЬЮЯҐЄІЇа-щьюяґєії'\s])+", text[1])
                 match2 = 'АктивнеНове'
-                match3 = '58500-00 Рентгенографія грудної клітки'
+                match3 = re.match(r"[5]\d+-\d+\s([А-ЩЬЮЯҐЄІЇа-щьюяґєії'\s])+", text[1])
 
                 cart_button = carts[i].find_elements(By.CLASS_NAME, "btn-info")[1]
                 time.sleep(2)
@@ -73,7 +73,7 @@ def filling_out_appointment_card(helsi_person):
                 else:
                     match4 = False
 
-                if match and text[0] == match2 and text[0] != match3 and match4:
+                if match and text[0] == match2 and match4 and not match3:
                     time.sleep(3)
                     print(f'find text: {cart_button.text}')
                     cart_button.click()
