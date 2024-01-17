@@ -9,10 +9,10 @@ from config import appointment_codes_file
 
 
 def extraction_of_appointment_code_into_text():
+
     try:
-
+        file = open(appointment_codes_file, 'a')
         # ------------------------------------------
-
         homepage_button = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.CLASS_NAME, 'timeline-home-page-um'))
         )
@@ -73,13 +73,14 @@ def extraction_of_appointment_code_into_text():
 
                 if e_appointment_card_code and re.match(r"\d+-\d+-\d+-\d+", e_appointment_card_code[0].text):
                     print(e_appointment_card_code[0].text)
-                    file = open(appointment_codes_file, 'a')
+
                     file.write(e_appointment_card_code[0].text + "\n")
 
             driver.back()
             driver.back()
 
-        time.sleep(60)
+        time.sleep(5)
+        file.close()
 
     except Exception as ex:
         print(ex)

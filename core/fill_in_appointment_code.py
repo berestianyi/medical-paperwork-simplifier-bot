@@ -3,6 +3,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import re
+import os
 import time
 
 from webdriver_set_up_settings import *
@@ -11,7 +12,6 @@ from config import uniqe_text, appointment_codes_file
 
 def filling_out_appointment_card(helsi_person):
     try:
-        
         with open(appointment_codes_file, 'r') as f:
             appointment_codes = f.read()
 
@@ -56,7 +56,7 @@ def filling_out_appointment_card(helsi_person):
             for i in range(len(carts_count)):
                 # робимо пошук всіх потрібних блоків
                 carts = driver.find_elements(By.CLASS_NAME, 'card')
-                print(carts[0].text)
+                # print(carts[0].text)
 
                 text = carts[i].text.split('\n')
                 print(text[1])
@@ -65,11 +65,18 @@ def filling_out_appointment_card(helsi_person):
                 match2 = 'АктивнеНове'
                 match3 = '58500-00 Рентгенографія грудної клітки'
 
-                if match and text[0] == match2 and text[0] != match3:
-                    cart = carts[i].find_elements(By.CLASS_NAME, "btn-info")[1]
-                    time.sleep(5)
-                    print(f'find text: {cart.text}')
-                    cart.click()
+                cart_button = carts[i].find_elements(By.CLASS_NAME, "btn-info")[1]
+                time.sleep(2)
+
+                if cart_button.text == 'Заповнити процедуру' or cart_button.text == 'Заповнити звіт':
+                    match4 = True
+                else:
+                    match4 = False
+
+                if match and text[0] == match2 and text[0] != match3 and match4:
+                    time.sleep(3)
+                    print(f'find text: {cart_button.text}')
+                    cart_button.click()
                     print('clicked on this text')
                     time.sleep(6)
 
@@ -105,9 +112,9 @@ def filling_out_appointment_card(helsi_person):
                         select_key_file[1].send_keys(helsi_person['helsi_key'])
                         time.sleep(2)
 
-                        accept_button = driver.find_elements(By.CLASS_NAME, 'storage-sign')[2]
+                        accept_button = driver.find_elements(By.CLASS_NAME, 'storage-sign')
                         print('found sign button')
-                        accept_button.click()
+                        accept_button[2].click()
                         print('clicked on sign button')
                         time.sleep(5)
 
@@ -115,26 +122,20 @@ def filling_out_appointment_card(helsi_person):
                         input_password[1].send_keys(helsi_person['helsi_key_password'])
                         time.sleep(2)
 
-                        accept_button = driver.find_elements(By.CLASS_NAME, 'storage-sign')[2]
+                        accept_button = driver.find_elements(By.CLASS_NAME, 'storage-sign')
                         print('found sign button')
-                        accept_button.click()
+                        accept_button[2].click()
                         print('clicked on sign button')
                         time.sleep(5)
 
                         one_time_file_input = False
                     else:
 
-                        accept_button = driver.find_elements(By.CLASS_NAME, 'storage-sign')[2]
+                        accept_button = driver.find_elements(By.CLASS_NAME, 'storage-sign')
                         print('found sign button')
-                        accept_button.click()
+                        accept_button[2].click()
                         print('clicked on sign button')
                         time.sleep(5)
-
-                    accept_button = driver.find_elements(By.CLASS_NAME, 'storage-sign')
-                    print('found sign button')
-                    accept_button[2].click()
-                    print('clicked on sign button')
-                    time.sleep(5)
 
                     appointment = driver.find_elements(By.CLASS_NAME, 'tooltip-parent')
                     appointment[5].click()
@@ -159,6 +160,9 @@ def filling_out_appointment_card(helsi_person):
 
         time.sleep(4)
 
+        f.close()
+
+
         # -------------------------------- cookies ---------------------------------------
         # pickle.dump(driver.get_cookies(), open('my_cookies', 'wb'))
         # for cookie in pickle.load(open('my_cookies', 'rb')):
@@ -170,5 +174,8 @@ def filling_out_appointment_card(helsi_person):
 
     except Exception as ex:
         print(ex)
+
+    else:
+        os.remove(appointment_codes_file)
 
         
