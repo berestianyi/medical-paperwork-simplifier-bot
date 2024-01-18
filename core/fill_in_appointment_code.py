@@ -63,15 +63,13 @@ def filling_out_appointment_card(helsi_person):
 
                 match = re.match(r"\d+-\d+\s([А-ЩЬЮЯҐЄІЇа-щьюяґєії'\s])+", text[1])
                 match2 = 'АктивнеНове'
-                match3 = re.match(r"[5]\d+-\d+\s([А-ЩЬЮЯҐЄІЇа-щьюяґєії'\s])+", text[1])
-
-                right_choices = ['Заповнити процедуру', 'Заповнити звіт']
+                match3 = re.match(r"^[5]{1}\d+-\d+\s([А-ЩЬЮЯҐЄІЇа-щьюяґєії'\s])+", text[1])
 
                 if match and text[0] == match2 and not match3:
 
                     cart_button = carts[i].find_elements(By.CLASS_NAME, "btn-info")[1]
 
-                    if any(cart_button.text in choice for choice in right_choices):
+                    if cart_button.text == 'Заповнити процедуру' or cart_button.text == 'Заповнити звіт':
                         time.sleep(4)
                         print(f'find text: {cart_button.text}')
                         cart_button.click()
