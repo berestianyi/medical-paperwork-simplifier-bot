@@ -2,5 +2,6 @@
 __pycache__/
 sign_codes/k.lena.jks
 sign_codes/lena.jks
+sign_codes/oks.jks
 config.py
 appointment_codes
