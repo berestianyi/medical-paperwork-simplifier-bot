@@ -1,3 +1,4 @@
+from selenium.webdriver import ActionChains, Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -31,13 +32,14 @@ def sign_in_helsi(helsi_person):
         # log_in_button.click()
         # time.sleep(4)
         # print("Log in button is clicked")
+
         log_in_button = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.XPATH, '//input[@type="submit"]'))
         )
         log_in_button.click()
         print("Log in button is clicked")
 
-        time.sleep(4)
+        time.sleep(7)
 
     except Exception as ex:
         print(ex)
