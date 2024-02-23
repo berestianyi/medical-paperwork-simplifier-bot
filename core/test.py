@@ -1,3 +1,4 @@
+# from selenium.webdriver.common.keys import Keys
 # import re
 # from config import uniqe_text
 #
@@ -20,3 +21,5 @@
 # appointment_codes_list = appointment_codes.split('\n')
 #
 # print(appointment_codes_list)
+
+# print(Keys)
