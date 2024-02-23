@@ -1,3 +1,4 @@
+from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.wait import WebDriverWait
@@ -21,87 +22,92 @@ def filling_out_appointment_card(helsi_person):
 
         for appointment_code in appointment_codes_list:
 
+            print('-------------------------')
             appointment = driver.find_elements(By.CLASS_NAME, 'tooltip-parent')
             appointment[5].click()
             time.sleep(3)
 
             # Вводимо направлення
-            # input_appointment = driver.find_element(By.CLASS_NAME, 'form-control')
             input_appointment = WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.CLASS_NAME, 'form-control'))
             )
-
             input_appointment.clear()
             input_appointment.send_keys(appointment_code)
+            print(f'input: {appointment_code}')
 
-            # input_appointment_btn = driver.find_element(By.CLASS_NAME, 'btn-info')
             input_appointment_btn = WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.CLASS_NAME, 'btn-info'))
             )
             input_appointment_btn.click()
 
+            # прогрузка всієї сторінки
+            time.sleep(1)
+            driver.execute_script("window.scrollTo(0, 3000);")
+            time.sleep(1)
+            driver.execute_script("window.scrollTo(0, 0);")
+            time.sleep(2)
+
             # робимо пошук всіх потрібних блоків
-            # request_list = driver.find_element(By.CLASS_NAME, 'ServiceRequestsList')
             request_list = WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.CLASS_NAME, 'ServiceRequestsList'))
             )
 
             carts_count = request_list.find_elements(By.CLASS_NAME, 'card')
-            # carts_count = WebDriverWait(request_list, 10).until(
-            #     EC.presence_of_all_elements_located((By.CLASS_NAME, 'card'))
-            # )
-            # print(carts_count[5].text)
-            # print(carts[0].text)
+            time.sleep(5)
 
             for i in range(len(carts_count)):
+
+                print(f'card numbere {i}/{len(carts_count)}')
+
                 # робимо пошук всіх потрібних блоків
                 carts = driver.find_elements(By.CLASS_NAME, 'card')
-                # print(carts[0].text)
 
                 text = carts[i].text.split('\n')
-                print(text[1])
 
-                match = re.match(r"\d+-\d+\s([А-ЩЬЮЯҐЄІЇа-щьюяґєії'\s])+", text[1])
-                match2 = 'АктивнеНове'
-                match3 = re.match(r"^[5]{1}\d+-\d+\s([А-ЩЬЮЯҐЄІЇа-щьюяґєії'\s])+", text[1])
+                match = re.match(r"\d+-\d+\s([А-ЩЬЮЯҐЄІЇа-щьюяґєії'\s])+", text[2])
+                match3 = re.match(r"^[5]{1}\d+-\d+\s([А-ЩЬЮЯҐЄІЇа-щьюяґєії'\s])+", text[2])
 
-                if match and text[0] == match2 and not match3:
+                if match and text[0] == 'Активне' and text[1] == 'Нове' and not match3:
 
                     cart_button = carts[i].find_elements(By.CLASS_NAME, "btn-info")[1]
+                    print(text[2])
 
                     if cart_button.text == 'Заповнити процедуру' or cart_button.text == 'Заповнити звіт':
-                        time.sleep(4)
+                        time.sleep(3)
                         print(f'find text: {cart_button.text}')
                         cart_button.click()
-                        print('clicked on this text')
-                        time.sleep(6)
+                        time.sleep(9)
 
                         confirm_button_div = driver.find_elements(By.CLASS_NAME, 'actions')
                         confirm_button = confirm_button_div[0].find_element(By.CLASS_NAME, 'btn-info')
+
+                        actions = ActionChains(driver)
+                        actions.move_to_element(confirm_button).perform()
+                        time.sleep(1)
+
                         confirm_button.click()
-                        print('нажано на кнопку підтвердити')
-                        time.sleep(7)
+                        print(f'clicked button: {confirm_button.text}')
+                        time.sleep(10)
 
                         health_place = driver.find_element(By.ID, 'locationId')
                         health_place.send_keys('філія №3')
-                        time.sleep(2)
+                        time.sleep(1)
                         health_place.send_keys(Keys.ENTER)
                         print('нажано на філію')
-                        time.sleep(5)
+                        time.sleep(2)
 
                         for conclusion_type in uniqe_text:
-                            if text[1] == conclusion_type:
+                            if text[2] == conclusion_type:
                                 print('Found needed argument')
                                 conclusion_fill = driver.find_element(By.ID, 'conclusion')
                                 conclusion_fill.send_keys('Проведено.')
-                                time.sleep(5)
-                                print('wrote needed text')
+                                time.sleep(3)
+                                print('wrote "Проведено."')
 
                         success_button = driver.find_element(By.CLASS_NAME, 'btn-success')
-                        print('found success button')
                         success_button.click()
-                        print('clicked on success button')
-                        time.sleep(7)
+                        print('clicked on success card button')
+                        time.sleep(10)
 
                         if one_time_file_input:
                             select_key_file = driver.find_elements(By.ID, 'selectKeyFile')
@@ -109,9 +115,8 @@ def filling_out_appointment_card(helsi_person):
                             time.sleep(2)
 
                             accept_button = driver.find_elements(By.CLASS_NAME, 'storage-sign')
-                            print('found sign button')
                             accept_button[2].click()
-                            print('clicked on sign button')
+                            print(f'clicked button {accept_button[2].text}')
                             time.sleep(5)
 
                             input_password = driver.find_elements(By.XPATH, "//input[@type='password']")
@@ -119,19 +124,17 @@ def filling_out_appointment_card(helsi_person):
                             time.sleep(2)
 
                             accept_button = driver.find_elements(By.CLASS_NAME, 'storage-sign')
-                            print('found sign button')
                             accept_button[2].click()
-                            print('clicked on sign button')
-                            time.sleep(5)
+                            print(f'clicked button: ПІДПИСАТИ')
+                            time.sleep(8)
 
                             one_time_file_input = False
                         else:
 
                             accept_button = driver.find_elements(By.CLASS_NAME, 'storage-sign')
-                            print('found sign button')
                             accept_button[2].click()
-                            print('clicked on sign button')
-                            time.sleep(5)
+                            print(f'clicked button: ПІДПИСАТИ')
+                            time.sleep(4)
 
                         appointment = driver.find_elements(By.CLASS_NAME, 'tooltip-parent')
                         appointment[5].click()
@@ -142,9 +145,10 @@ def filling_out_appointment_card(helsi_person):
                         # input_appointment = WebDriverWait(driver, 10).until(
                         #     EC.presence_of_element_located((By.CLASS_NAME, 'form-control'))
                         # )
-
+                        print("-------------------------")
                         input_appointment.clear()
                         input_appointment.send_keys(appointment_code)
+                        print(f'input: {appointment_code}')
                         time.sleep(3)
 
                         input_appointment_btn = driver.find_element(By.CLASS_NAME, 'btn-info')
@@ -152,7 +156,7 @@ def filling_out_appointment_card(helsi_person):
                         #     EC.presence_of_element_located((By.CLASS_NAME, 'btn-info'))
                         # )
                         input_appointment_btn.click()
-                        time.sleep(3)
+                        time.sleep(4)
 
         time.sleep(4)
 
