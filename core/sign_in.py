@@ -28,16 +28,11 @@ def sign_in_helsi(helsi_person):
         print("Password is entered")
         time.sleep(1)
 
-        # log_in_button = driver.find_element(By.XPATH, '//input[@type="submit"]')
-        # log_in_button.click()
-        # time.sleep(4)
-        # print("Log in button is clicked")
-
         log_in_button = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.XPATH, '//input[@type="submit"]'))
         )
         log_in_button.click()
-        print("Log in button is clicked")
+        print("Log in success")
 
         time.sleep(7)
 

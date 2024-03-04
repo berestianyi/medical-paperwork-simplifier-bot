@@ -1,7 +1,7 @@
 from selenium import webdriver
 from fake_useragent import UserAgent
-from selenium.webdriver.firefox.options import Options as FirefoxOptions
-from selenium.webdriver.firefox.firefox_profile import FirefoxProfile
+# from selenium.webdriver.firefox.options import Options as FirefoxOptions
+# from selenium.webdriver.firefox.firefox_profile import FirefoxProfile
 
 useragent = UserAgent()
 
