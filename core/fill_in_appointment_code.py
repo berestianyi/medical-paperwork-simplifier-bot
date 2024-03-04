@@ -9,21 +9,26 @@ import time
 from utils.core import button_status_validation, card_text_validation, card_status_validation
 from webdriver_set_up_settings import *
 from config import uniqe_text, appointment_codes_file
+from database.orm import ORM
 
 
 def filling_out_appointment_card(helsi_person):
     try:
-        with open(appointment_codes_file, 'r') as f:
-            appointment_codes = f.read()
+        # with open(appointment_codes_file, 'r') as f:
+        #     appointment_codes = f.read()
 
-        appointment_codes_list = appointment_codes.split('\n')
+        # appointment_codes_list = appointment_codes.split('\n')
+
+        appointment_codes_list = ORM.select_today_codes(user=helsi_person['text_name'])
 
         one_time_file_input = True
+        index = 0
 
         for appointment_code in appointment_codes_list:
 
             print('-------------------------')
-            print(f"{appointment_code}")
+            index += 1
+            print(f"{appointment_code}   {index}/{len(appointment_codes_list)}")
             appointment = driver.find_elements(By.CLASS_NAME, 'tooltip-parent')
             appointment[5].click()
             time.sleep(3)
@@ -51,6 +56,7 @@ def filling_out_appointment_card(helsi_person):
             time.sleep(5)
 
             for i in range(len(carts_count)):
+                print('-------------------------')
                 # робимо пошук всіх потрібних блоків
                 cards = driver.find_elements(By.CLASS_NAME, 'card')
                 print(f"{i+1}/{len(carts_count)}")
@@ -155,7 +161,7 @@ def filling_out_appointment_card(helsi_person):
 
         time.sleep(4)
 
-        f.close()
+        # f.close()
 
 
         # -------------------------------- cookies ---------------------------------------
