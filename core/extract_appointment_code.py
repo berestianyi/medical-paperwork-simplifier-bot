@@ -4,16 +4,15 @@ from selenium.webdriver.support import expected_conditions as EC
 import re
 import time
 
-from webdriver_set_up_settings import *
-from config import appointment_codes_file
+from utils.webdriver_set_up_settings import *
 from database.orm import ORM
 
 
-def extraction_of_appointment_code_into_text(user):
+async def extraction_of_appointment_code_into_text(user, msg):
 
     try:
-        # file = open(appointment_codes_file, 'a')
-        # ------------------------------------------
+        await msg.answer(f"пошук кодів для {user['name']} розпочався")
+
         homepage_button = WebDriverWait(driver, 10).until(
             EC.element_to_be_clickable((By.CLASS_NAME, 'timeline-home-page-um'))
         )
@@ -27,7 +26,7 @@ def extraction_of_appointment_code_into_text(user):
         # print("Past is clicked")
 
         time.sleep(1)
-        driver.execute_script("window.scrollTo(0, 2000);")
+        driver.execute_script("window.scrollTo(0, 4000);")
         time.sleep(1)
         driver.execute_script("window.scrollTo(0, 0);")
         time.sleep(2)
@@ -36,11 +35,12 @@ def extraction_of_appointment_code_into_text(user):
             EC.presence_of_all_elements_located((By.CLASS_NAME, 'timeline-item-right'))
         )
         print(len(all_appointment_cards))
+        await msg.answer(f"Всього кодів: {len(all_appointment_cards)}")
 
         for i in range(len(all_appointment_cards)):
 
             time.sleep(1)
-            driver.execute_script("window.scrollTo(0, 2000);")
+            driver.execute_script("window.scrollTo(0, 4000);")
             time.sleep(1)
             driver.execute_script("window.scrollTo(0, 0);")
             time.sleep(2)
@@ -74,15 +74,18 @@ def extraction_of_appointment_code_into_text(user):
 
                 if e_appointment_card_code and re.match(r"\d+-\d+-\d+-\d+", e_appointment_card_code[0].text):
                     print(e_appointment_card_code[0].text)
+                    await msg.answer(f"{e_appointment_card_code[0].text}")
 
                     ORM.insert_data_unique_code(user=user['text_name'], code=e_appointment_card_code[0].text)
-                    # file.write(e_appointment_card_code[0].text + "\n")
 
             driver.back()
             driver.back()
 
         time.sleep(5)
-        # file.close()
 
     except Exception as ex:
         print(ex)
+        await msg.answer(f"Виникла помилка \n\n {ex}")
+
+    finally:
+        driver.close()

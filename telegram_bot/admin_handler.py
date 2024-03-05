@@ -18,7 +18,8 @@ class User(StatesGroup):
 
 
 @admin_router.message(CommandStart())
-async def command_start(message: Message):
+async def command_start(message: Message, state: FSMContext):
+    await state.clear()
     if message.from_user.id == admin_id:
         await message.answer(f"Шалом, {message.from_user.first_name}\n"
                              f"З кого розпочинаємо?", reply_markup=user_choice)
@@ -29,7 +30,6 @@ async def command_start(message: Message):
 @admin_router.message((F.from_user.id == admin_id) & (F.text.startswith('Розпочинаємо')))
 async def find_codes(message: Message, state: FSMContext):
     action = message.text.split(" з ")[1]
-    await state.clear()
 
     if action == helsi_data['Г.Л.'].get('name'):
         user: dict = helsi_data['Г.Л.']
@@ -50,16 +50,16 @@ async def user_menu(callback: CallbackQuery, state: FSMContext):
     user = user_list.get('user')
 
     if action == 'search':
-        sign_in.sign_in_helsi(user)
-        extract_appointment_code.extraction_of_appointment_code_into_text(user)
+        await sign_in.sign_in_helsi(helsi_person=user, msg=callback.message)
+        await extract_appointment_code.extraction_of_appointment_code_into_text(user=user, msg=callback.message)
         await callback.message.answer(f"Меню для користувача {user['name']}", reply_markup=def_choice)
 
     elif action == 'add':
         await callback.message.answer(f"Надсилайте коди")
 
     elif action == 'close':
-        sign_in.sign_in_helsi(user)
-        fill_in_appointment_code.filling_out_appointment_card(user)
+        await sign_in.sign_in_helsi(helsi_person=user, msg=callback.message)
+        await fill_in_appointment_code.filling_out_appointment_card(helsi_person=user, msg=callback.message)
         await callback.message.answer(f"Меню для користувача {user['name']}", reply_markup=def_choice)
 
     elif action == 'exit':

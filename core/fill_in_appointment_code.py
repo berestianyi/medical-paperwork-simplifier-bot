@@ -3,21 +3,17 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-import os
 import time
 
 from utils.core import button_status_validation, card_text_validation, card_status_validation
-from webdriver_set_up_settings import *
-from config import uniqe_text, appointment_codes_file
+from utils.webdriver_set_up_settings import *
+from config import uniqe_text
 from database.orm import ORM
 
 
-def filling_out_appointment_card(helsi_person):
+async def filling_out_appointment_card(helsi_person, msg):
     try:
-        # with open(appointment_codes_file, 'r') as f:
-        #     appointment_codes = f.read()
-
-        # appointment_codes_list = appointment_codes.split('\n')
+        await msg.answer(f"Заповнення для {helsi_person['name']} розпочалося")
 
         appointment_codes_list = ORM.select_today_codes(user=helsi_person['text_name'])
 
@@ -28,7 +24,10 @@ def filling_out_appointment_card(helsi_person):
 
             print('-------------------------')
             index += 1
+
             print(f"{appointment_code}   {index}/{len(appointment_codes_list)}")
+            await msg.answer(f"{appointment_code}   {index}/{len(appointment_codes_list)}")
+
             appointment = driver.find_elements(By.CLASS_NAME, 'tooltip-parent')
             appointment[5].click()
             time.sleep(3)
@@ -70,6 +69,7 @@ def filling_out_appointment_card(helsi_person):
                         EC.presence_of_all_elements_located((By.CLASS_NAME, "btn-info"))
                     )
                     print(text[2])
+                    await msg.answer(f"{i+1}/{len(carts_count)}   {text[2]}")
 
                     if button_status_validation(card_button[1].text):
                         time.sleep(12)
@@ -161,22 +161,11 @@ def filling_out_appointment_card(helsi_person):
 
         time.sleep(4)
 
-        # f.close()
-
-
-        # -------------------------------- cookies ---------------------------------------
-        # pickle.dump(driver.get_cookies(), open('my_cookies', 'wb'))
-        # for cookie in pickle.load(open('my_cookies', 'rb')):
-        #     driver.add_cookie(cookie)
-        #
-        # time.sleep(5)
-        # driver.refresh()
-        # time.sleep(5)
-
     except Exception as ex:
         print(ex)
+        await msg.answer(f"Виникла помилка \n\n {ex}")
 
-    else:
-        os.remove(appointment_codes_file)
+    finally:
+        driver.close()
 
         

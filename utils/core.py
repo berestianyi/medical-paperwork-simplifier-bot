@@ -1,7 +1,7 @@
 import re
 
 from config import appointment_codes_file
-from webdriver_set_up_settings import driver
+from utils.webdriver_set_up_settings import driver
 
 
 def card_text_validation(card_text):
@@ -25,14 +25,3 @@ def button_status_validation(status):
         return True
     else:
         return False
-
-
-def add_code_to_file(text):
-    file = open(appointment_codes_file, 'a')
-    file.write(text)
-    file.close()
-
-
-def close_driver():
-    driver.close()
-    driver.quit()
